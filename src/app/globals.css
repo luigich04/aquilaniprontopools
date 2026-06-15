@@ -1,26 +1,199 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfbfa;
+  --foreground: #111111;
+  --glow-color: rgba(234, 232, 225, 0.9);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-host-grotesk);
+  --font-mono: var(--font-dm-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0b0b0a;
+    --foreground: #f5f5f4;
+    --glow-color: rgba(34, 33, 31, 0.9);
   }
 }
 
+/*
+  FIX: separare html e body.
+  html: height auto permette alla pagina di espandersi con il contenuto.
+       Senza questo, "h-full" dal layout blocca html a 100vh e non si scrolla.
+  body: overflow-x nasconde eventuali overflow orizzontali durante le animazioni
+        (es. scale/translate del last-frame-wrapper).
+*/
+html {
+  height: auto !important;
+  min-height: 100vh;
+}
+
 body {
+  min-height: 100vh;
+  overflow-x: hidden;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-host-grotesk), sans-serif;
+}
+
+.font-host {
+  font-family: var(--font-host-grotesk), sans-serif;
+}
+
+.font-dm {
+  font-family: var(--font-dm-mono), monospace;
+}
+
+.font-helvetica-ltw {
+  font-family: "HelveticaNeueLTW", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Frame cinematici: layer GPU per effetti 3D rotateX/scale/opacity */
+.cinematic-frame {
+  will-change: transform, opacity;
+  transform-style: preserve-3d;
+}
+
+.cinematic-frame img {
+  will-change: transform;
+  transition: none;
+}
+
+/*
+  Wrapper dell'ultima immagine: layer GPU dedicato per l'animazione
+  di centramento (translate X + scale) nel pin finale.
+  Separato da .cinematic-frame per evitare conflitti di transform.
+*/
+.last-frame-wrapper {
+  will-change: transform;
+}
+
+/* Transizione hover colore — abilitata solo dopo il completamento dell'animazione GSAP */
+.entry-complete .left-word {
+  transition: color 0.3s ease-out;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SEZIONE SOLUZIONI - DARK LUXURY
+   ───────────────────────────────────────────────────────────────────────── */
+.section-soluzioni {
+  background: #050505;
+  color: #f5f3ef;
+  position: relative;
+}
+
+.section-soluzioni::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(120, 180, 255, 0.08), transparent 35%),
+    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03), transparent 30%);
+  pointer-events: none;
+}
+
+.soluzioni-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(245, 243, 239, 0.65);
+}
+
+.soluzioni-title {
+  font-size: clamp(34px, 5.5vw, 58px);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: #f5f3ef;
+}
+
+.soluzioni-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+@media (max-width: 768px) {
+  .soluzioni-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.soluzione-card {
+  min-height: 340px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Effetto riflesso acqua astratto */
+.soluzione-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(158, 216, 255, 0.04), transparent 50%);
+  opacity: 0.8;
+  transition: opacity 0.45s ease, background 0.45s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.soluzione-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(158, 216, 255, 0.3);
+}
+
+.soluzione-card:hover::before {
+  opacity: 1;
+  background: radial-gradient(circle at 80% 20%, rgba(158, 216, 255, 0.1), transparent 50%);
+}
+
+/* Bottone CTA Premium */
+.soluzioni-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 0 38px;
+  border-radius: 999px;
+  background: #f5f3ef;
+  color: #050505;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: var(--font-mono), monospace;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.soluzioni-cta-btn:hover {
+  transform: scale(1.03);
+  background: #ffffff;
+  box-shadow:
+    0 15px 40px rgba(255, 255, 255, 0.08),
+    0 0 25px rgba(158, 216, 255, 0.15);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FIXED HEADER - PREMIUM GLASSMORPHISM
+   ───────────────────────────────────────────────────────────────────────── */
+header.scrolled {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  background-color: rgba(8, 8, 8, 0.6) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
 }
