@@ -191,9 +191,22 @@ body {
 header.scrolled {
   padding-top: 14px !important;
   padding-bottom: 14px !important;
-  background-color: rgba(8, 8, 8, 0.6) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ANIMATION KEYFRAMES
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
 }
