@@ -9,7 +9,7 @@ export default function Hero({ canvasRef, bgImageRef, overlayRef, heroTextRef })
       style={{ perspective: "1000px", transformStyle: "preserve-3d" }}
     >
       {/* Canvas: sequenza frame video */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0 hidden lg:block" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" />
 
       {/* Immagine di sfondo iniziale (sfuma per rivelare il canvas) */}
       <Image

@@ -104,33 +104,23 @@ export default function Home() {
       }
     }
   };
+
   useGSAP(
     () => {
-      const mm = gsap.matchMedia();
-
-      // 1. Initialize Lenis at the very top (Desktop only) so that ScrollTriggers created later hook into it correctly.
-      mm.add("(min-width: 1024px)", () => {
-        const lenis = new Lenis({
-          duration: 1.8,
-          easing: (t) => 1 - Math.pow(1 - t, 5),
-        });
-        if (typeof window !== "undefined") {
-          window.lenis = lenis;
-        }
-        const lenisRafFn = (time) => lenis.raf(time * 1000);
-        gsap.ticker.add(lenisRafFn);
-        gsap.ticker.lagSmoothing(0);
-        lenis.on("scroll", ScrollTrigger.update);
-
-        return () => {
-          lenis.off("scroll", ScrollTrigger.update);
-          lenis.destroy();
-          gsap.ticker.remove(lenisRafFn);
-          if (typeof window !== "undefined") {
-            delete window.lenis;
-          }
-        };
+      // ─────────────────────────────────────────────────────────────────────────
+      // 1. LENIS — smooth scroll only.
+      // ─────────────────────────────────────────────────────────────────────────
+      const lenis = new Lenis({
+        duration: 1.8,
+        easing: (t) => 1 - Math.pow(1 - t, 5),
       });
+      if (typeof window !== "undefined") {
+        window.lenis = lenis;
+      }
+      const lenisRafFn = (time) => lenis.raf(time * 1000);
+      gsap.ticker.add(lenisRafFn);
+      gsap.ticker.lagSmoothing(0);
+      lenis.on("scroll", ScrollTrigger.update);
 
       // ─────────────────────────────────────────────────────────────────────────
       // 2. ENTRANCE ANIMATIONS — al caricamento della pagina.
@@ -352,6 +342,7 @@ export default function Home() {
       // ─────────────────────────────────────────────────────────────────────────
       // 7. FINAL FRAME PIN + ANIMAZIONE CENTRAMENTO (desktop & mobile matchMedia)
       // ─────────────────────────────────────────────────────────────────────────
+      const mm = gsap.matchMedia();
       function initFinalFramePin() {
         const overviewSection = document.getElementById("overview");
         const lastWrapper = document.querySelector(".last-frame-wrapper");
@@ -701,26 +692,25 @@ export default function Home() {
 
       // ─── BOOTSTRAP ───────────────────────────────────────────────────────────
       initEntranceAnim();
+      const canvasData = initCanvas();
+      initHeroPin(canvasData);
       initHeadingReveal();
       initFinalFramePin();
-
-      // Initialize Hero Pin and Canvas only on Desktop
-      mm.add("(min-width: 1024px)", () => {
-        const canvasData = initCanvas();
-        initHeroPin(canvasData);
-
-        return () => {
-          canvasData?.cleanup();
-        };
-      });
 
       // Ricalcola tutte le posizioni dopo che tutti i trigger sono registrati
       ScrollTrigger.refresh();
 
       // ─── CLEANUP COMPLETO ─────────────────────────────────────────────────────
       return () => {
-        mm.revert(); // reverte matchMedia e tutti i suoi trigger ed effetti
+        if (typeof window !== "undefined") {
+          delete window.lenis;
+        }
+        mm.revert(); // reverte matchMedia e i suoi trigger
+        lenis.off("scroll", ScrollTrigger.update);
+        lenis.destroy();
+        gsap.ticker.remove(lenisRafFn);
         ScrollTrigger.getAll().forEach((t) => t.kill()); // kill tutti i trigger rimasti
+        canvasData?.cleanup(); // rimuove resize listener del canvas
       };
     },
     { scope: containerRef }

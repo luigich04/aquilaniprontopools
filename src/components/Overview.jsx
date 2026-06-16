@@ -94,57 +94,45 @@ export default function Overview() {
                       style={{ height: "52vh" }}
                     >
                       {!isLast ? (
-                        <Image
+                        <img
                           src={src}
                           alt={alt}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 60vw"
-                          unoptimized
+                          className="absolute inset-0 w-full h-full object-cover"
                         />
                       ) : (
                         <>
                           {/* Layer 1: pool_06_lifestyle.jpg */}
-                          <Image
+                          <img
                             src={src}
                             alt={alt}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 60vw"
-                            unoptimized
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
 
                           {/* Layer 2: foto-t2.jpg */}
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="zoom-layer-2 w-[40%] h-[40%] relative overflow-hidden flex items-center justify-center">
-                              <Image
+                              <img
                                 src="/img/foto-t2.jpg"
                                 alt="Second Inception Step"
-                                fill
-                                className="object-cover"
-                                unoptimized
+                                className="absolute inset-0 w-full h-full object-cover"
                               />
 
                               {/* Layer 3: foto-t3.jpg */}
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="zoom-layer-3 w-[40%] h-[40%] relative overflow-hidden flex items-center justify-center">
-                                  <Image
+                                  <img
                                     src="/img/foto-t3.jpg"
                                     alt="Third Inception Step"
-                                    fill
-                                    className="object-cover"
-                                    unoptimized
+                                    className="absolute inset-0 w-full h-full object-cover"
                                   />
 
                                   {/* Layer 4: cta preview */}
                                   <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="zoom-layer-cta w-[40%] h-[40%] relative overflow-hidden bg-[#050505] flex flex-col items-center justify-center select-none">
-                                      <Image
+                                      <img
                                         src="/img/bg_soluzioni.png"
                                         alt="Solutions Background Preview"
-                                        fill
-                                        className="object-cover opacity-40"
-                                        unoptimized
+                                        className="absolute inset-0 w-full h-full object-cover opacity-40"
                                       />
                                     </div>
                                   </div>
