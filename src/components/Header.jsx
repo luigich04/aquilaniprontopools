@@ -93,81 +93,62 @@ export default function Header({
         {/* CTA a destra */}
         <div className="hidden md:flex items-center gap-3 font-dm z-[110]">
           <a
-            href="#demo"
-            onClick={(e) => scrollToSection(e, "demo")}
-            className={`nav-item text-[11px] font-semibold tracking-wider transition-colors duration-500 rounded-md px-5 py-2.5 uppercase text-center border hidden sm:inline-block ${
-              headerTheme === "light"
-                ? "text-black bg-black/5 border-black/20 hover:bg-black/15"
-                : "text-white bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20"
-            }`}
-          >
-            Live Demo
-          </a>
-          <a
-            href="#get-started"
-            onClick={(e) => scrollToSection(e, "get-started")}
+            href="#contact"
+            onClick={(e) => scrollToSection(e, "contact")}
             className={`nav-item text-[11px] font-semibold tracking-wider transition-colors duration-500 rounded-md px-5 py-2.5 uppercase text-center ${
               headerTheme === "light"
                 ? "text-white bg-black hover:bg-neutral-800"
                 : "text-black bg-white hover:bg-neutral-200"
             }`}
           >
-            Get Started
+            Contattaci
           </a>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[99] flex flex-col justify-center items-center transition-all duration-500 animate-fadeIn md:hidden">
-          <nav className="flex flex-col items-center gap-8 font-dm text-lg font-medium tracking-widest text-white">
-            {[
-              { label: "HOME", target: "hero" },
-              { label: "IL METODO", target: "overview" },
-              { label: "SOLUZIONI", target: "solutions" },
-              { label: "PRIMA / DOPO", target: "transformation" },
-            ].map((item, idx) => (
-              <a
-                key={item.label}
-                href={`#${item.target}`}
-                onClick={(e) => {
-                  setIsMobileMenuOpen(false);
-                  scrollToSection(e, item.target);
-                }}
-                className="hover:text-neutral-400 transition-colors uppercase py-2 animate-fadeIn"
-                style={{ animationDelay: `${idx * 0.1}s` }}
-              >
-                {item.label}
-              </a>
-            ))}
-            <div
-              className="flex flex-col gap-4 mt-8 w-48 font-dm text-[11px] font-semibold tracking-wider uppercase text-center animate-fadeIn"
-              style={{ animationDelay: "0.4s" }}
+      <div
+        className={`fixed inset-0 bg-black/95 backdrop-blur-xl z-[99] flex flex-col justify-center items-center transition-all duration-500 md:hidden ${
+          isMobileMenuOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <nav className="flex flex-col items-center gap-8 font-dm text-lg font-medium tracking-widest text-white">
+          {[
+            { label: "HOME", target: "hero" },
+            { label: "IL METODO", target: "overview" },
+            { label: "SOLUZIONI", target: "solutions" },
+            { label: "PRIMA / DOPO", target: "transformation" },
+          ].map((item, idx) => (
+            <a
+              key={item.label}
+              href={`#${item.target}`}
+              onClick={(e) => {
+                setIsMobileMenuOpen(false);
+                scrollToSection(e, item.target);
+              }}
+              className="hover:text-neutral-400 transition-colors uppercase py-2"
             >
-              <a
-                href="#demo"
-                onClick={(e) => {
-                  setIsMobileMenuOpen(false);
-                  scrollToSection(e, "demo");
-                }}
-                className="text-white bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 rounded-md py-3 px-6"
-              >
-                Live Demo
-              </a>
-              <a
-                href="#get-started"
-                onClick={(e) => {
-                  setIsMobileMenuOpen(false);
-                  scrollToSection(e, "get-started");
-                }}
-                className="text-black bg-white hover:bg-neutral-200 rounded-md py-3 px-6"
-              >
-                Get Started
-              </a>
-            </div>
-          </nav>
-        </div>
-      )}
+              {item.label}
+            </a>
+          ))}
+          <div
+            className="flex flex-col gap-4 mt-8 w-48 font-dm text-[11px] font-semibold tracking-wider uppercase text-center"
+          >
+            <a
+              href="#contact"
+              onClick={(e) => {
+                setIsMobileMenuOpen(false);
+                scrollToSection(e, "contact");
+              }}
+              className="text-black bg-white hover:bg-neutral-200 rounded-md py-3 px-6"
+            >
+              Contattaci
+            </a>
+          </div>
+        </nav>
+      </div>
     </>
   );
 }

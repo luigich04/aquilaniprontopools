@@ -69,6 +69,11 @@ export default function Home() {
     const h = window.innerHeight;
 
     if (isDesktop && window.lenis) {
+      if (sectionName === "contact" || sectionName === "get-started") {
+        window.lenis.scrollTo("bottom", { duration: 1.5 });
+        return;
+      }
+
       let targetScroll = 0;
       if (sectionName === "hero" || sectionName === "home") {
         targetScroll = 0;
@@ -78,8 +83,6 @@ export default function Home() {
         targetScroll = 9.4 * h;
       } else if (
         sectionName === "transformation" ||
-        sectionName === "contact" ||
-        sectionName === "get-started" ||
         sectionName === "demo"
       ) {
         targetScroll = 11.0 * h;
@@ -88,12 +91,11 @@ export default function Home() {
     } else {
       let targetId = sectionName;
       if (sectionName === "home") targetId = "hero";
-      if (
-        sectionName === "contact" ||
-        sectionName === "get-started" ||
-        sectionName === "demo"
-      )
+      if (sectionName === "demo") {
         targetId = "transformation";
+      } else if (sectionName === "contact" || sectionName === "get-started") {
+        targetId = "contact";
+      }
       if (sectionName === "hero") {
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -108,19 +110,26 @@ export default function Home() {
   useGSAP(
     () => {
       // ─────────────────────────────────────────────────────────────────────────
-      // 1. LENIS — smooth scroll only.
+      // 1. LENIS — smooth scroll only (desktop only to prevent mobile lag).
       // ─────────────────────────────────────────────────────────────────────────
-      const lenis = new Lenis({
-        duration: 1.8,
-        easing: (t) => 1 - Math.pow(1 - t, 5),
-      });
-      if (typeof window !== "undefined") {
-        window.lenis = lenis;
+      let lenis = null;
+      let lenisRafFn = null;
+
+      const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+
+      if (isDesktop) {
+        lenis = new Lenis({
+          duration: 1.8,
+          easing: (t) => 1 - Math.pow(1 - t, 5),
+        });
+        if (typeof window !== "undefined") {
+          window.lenis = lenis;
+        }
+        lenisRafFn = (time) => lenis.raf(time * 1000);
+        gsap.ticker.add(lenisRafFn);
+        gsap.ticker.lagSmoothing(0);
+        lenis.on("scroll", ScrollTrigger.update);
       }
-      const lenisRafFn = (time) => lenis.raf(time * 1000);
-      gsap.ticker.add(lenisRafFn);
-      gsap.ticker.lagSmoothing(0);
-      lenis.on("scroll", ScrollTrigger.update);
 
       // ─────────────────────────────────────────────────────────────────────────
       // 2. ENTRANCE ANIMATIONS — al caricamento della pagina.
@@ -149,24 +158,38 @@ export default function Home() {
         if (!canvas) return null;
 
         const ctx = canvas.getContext("2d");
-        const frameCount = 109;
-        const images = [];
+        let isMobile = window.innerWidth < 1024;
+        let frameCount = isMobile ? 111 : 114;
+        let images = [];
         const state = { frame: 0 };
 
-        const getFrameSrc = (i) => `/frames/frame_${(i + 1).toString().padStart(4, "0")}.jpg`;
+        const getFrameSrc = (i) => {
+          if (isMobile) {
+            return `/frames_mobile/ezgif-frame-${(i + 1).toString().padStart(3, "0")}.png`;
+          } else {
+            return `/frames_pc/ezgif-frame-${(i + 1).toString().padStart(3, "0")}.png`;
+          }
+        };
 
         const setCanvasSize = () => {
           const pr = window.devicePixelRatio || 1;
+          const isMobileViewport = window.innerWidth < 1024;
+          
           canvas.width = window.innerWidth * pr;
-          canvas.height = window.innerHeight * pr;
-          canvas.style.width = `${window.innerWidth}px`;
-          canvas.style.height = `${window.innerHeight}px`;
+          // Use screen height on mobile to ensure the buffer is large enough for address bar collapse
+          canvas.height = (isMobileViewport ? Math.max(window.innerHeight, window.screen.height) : window.innerHeight) * pr;
+          
+          // Clear inline styles so absolute inset-0 w-full h-full CSS classes handle layout size
+          canvas.style.removeProperty("width");
+          canvas.style.removeProperty("height");
+          
           ctx.setTransform(pr, 0, 0, pr, 0, 0);
         };
 
         const render = () => {
-          const w = window.innerWidth;
-          const h = window.innerHeight;
+          const pr = window.devicePixelRatio || 1;
+          const w = canvas.width / pr;
+          const h = canvas.height / pr;
           ctx.clearRect(0, 0, w, h);
           const img = images[state.frame];
 
@@ -210,25 +233,44 @@ export default function Home() {
             ctx.fillStyle = "#a3a3a3";
             ctx.font = "11px var(--font-host-grotesk), sans-serif";
             ctx.fillText(
-              "Inserisci frame_0001.jpg → frame_0109.jpg in public/frames/",
+              isMobile
+                ? "Caricamento sequenza mobile in corso..."
+                : "Caricamento sequenza desktop in corso...",
               w / 2,
               h / 2 + 15
             );
           }
         };
 
+        const preloadImages = () => {
+          images = [];
+          for (let i = 0; i < frameCount; i++) {
+            const img = new window.Image();
+            img.onload = img.onerror = () => render();
+            img.src = getFrameSrc(i);
+            images.push(img);
+          }
+        };
+
         setCanvasSize();
+        preloadImages();
         render();
 
-        // Preload tutti i frame; ogni load aggiorna il render
-        for (let i = 0; i < frameCount; i++) {
-          const img = new window.Image();
-          img.onload = img.onerror = () => render();
-          img.src = getFrameSrc(i);
-          images.push(img);
-        }
-
+        let lastWidth = window.innerWidth;
         const handleResize = () => {
+          const currentIsMobile = window.innerWidth < 1024;
+          
+          if (currentIsMobile !== isMobile) {
+            isMobile = currentIsMobile;
+            frameCount = isMobile ? 111 : 114;
+            preloadImages();
+          }
+
+          if (currentIsMobile && window.innerWidth === lastWidth) {
+            return;
+          }
+
+          lastWidth = window.innerWidth;
           setCanvasSize();
           render();
           ScrollTrigger.refresh();
@@ -238,7 +280,9 @@ export default function Home() {
         return {
           state,
           render,
-          frameCount,
+          get frameCount() {
+            return frameCount;
+          },
           cleanup: () => window.removeEventListener("resize", handleResize),
         };
       }
@@ -519,50 +563,50 @@ export default function Home() {
           pinTl
             .call(() => {
               const time = pinTl.time();
-              setHeaderTheme(time < 3.9 ? "light" : "dark");
+              setHeaderTheme(time < 7.2 ? "light" : "dark");
             }, null, 0)
             .call(() => {
               const time = pinTl.time();
-              setHeaderTheme(time < 3.9 ? "light" : "dark");
-            }, null, 3.9)
+              setHeaderTheme(time < 7.2 ? "light" : "dark");
+            }, null, 7.2)
             .to(".mobile-horizontal-track", {
-              x: () => -(window.innerWidth * 3),
+              x: () => {
+                const track = document.querySelector(".mobile-horizontal-track");
+                return track ? -(track.offsetWidth * 3) : -(window.innerWidth * 3);
+              },
               ease: "none",
-              duration: 2.0,
-            })
+              duration: 4.0,
+            }, 0)
             // Frame 2 active
-            .to(frames[1], { rotateX: 0, scale: 1, opacity: 1, duration: 0.4 }, 0.4)
-            .to(frames[0], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.4 }, 0.4)
+            .to(frames[1], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 0.8)
+            .to(frames[0], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 0.8)
             // Frame 3 active
-            .to(frames[2], { rotateX: 0, scale: 1, opacity: 1, duration: 0.4 }, 1.0)
-            .to(frames[1], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.4 }, 1.0)
+            .to(frames[2], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 2.0)
+            .to(frames[1], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 2.0)
             // Frame 4 active
-            .to(frames[3], { rotateX: 0, scale: 1, opacity: 1, duration: 0.4 }, 1.6)
-            .to(frames[2], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.4 }, 1.6)
+            .to(frames[3], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 3.2)
+            .to(frames[2], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 3.2)
 
             // Fade out left text panel and captions
             .to(
               [leftPanel, ".last-caption"],
-              { opacity: 0, duration: 0.4, ease: "power2.inOut" },
-              1.6
+              { opacity: 0, duration: 0.8, ease: "power2.inOut" },
+              3.2
             )
 
             // Centering last wrapper visually onto mobile screen center
             .to(
               lastWrapper,
               {
-                x: () => {
-                  const rect = lastWrapper.getBoundingClientRect();
-                  return window.innerWidth / 2 - (rect.left + rect.width / 2);
-                },
+                x: 0,
                 y: () => {
                   const rect = lastWrapper.getBoundingClientRect();
                   return window.innerHeight / 2 - (rect.top + rect.height / 2);
                 },
-                duration: 0.6,
+                duration: 1.0,
                 ease: "power2.inOut",
               },
-              2.0
+              4.0
             )
             // Scale last wrapper zoom
             .to(
@@ -574,35 +618,35 @@ export default function Home() {
                   const scaleY = window.innerHeight / rect.height;
                   return Math.max(scaleX, scaleY) * 1.05;
                 },
-                duration: 1.2,
+                duration: 2.0,
                 ease: "none",
               },
-              2.6
+              5.0
             )
             .fromTo(
               ".zoom-layer-2",
               { scale: 0 },
-              { scale: 2.5, duration: 1.2, ease: "none" },
-              2.7
+              { scale: 2.5, duration: 1.8, ease: "none" },
+              5.2
             )
             .fromTo(
               ".zoom-layer-3",
               { scale: 0 },
-              { scale: 2.5, duration: 1.2, ease: "none" },
-              2.8
+              { scale: 2.5, duration: 1.6, ease: "none" },
+              5.4
             )
             .fromTo(
               ".zoom-layer-cta",
               { scale: 0 },
-              { scale: 2.5, duration: 1.2, ease: "none" },
-              2.9
+              { scale: 2.5, duration: 1.4, ease: "none" },
+              5.6
             )
             // Solutions Section
             .fromTo(
               ctaSection,
               { scale: 0.9, opacity: 0 },
-              { opacity: 1, scale: 1, pointerEvents: "auto", duration: 0.5, ease: "power2.out" },
-              3.9
+              { opacity: 1, scale: 1, pointerEvents: "auto", duration: 0.8, ease: "power2.out" },
+              7.2
             )
             .fromTo(
               [
@@ -611,8 +655,8 @@ export default function Home() {
                 ctaSection.querySelector(".soluzioni-cta"),
               ],
               { y: 35, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, stagger: 0.12, ease: "power3.out" },
-              4.2
+              { y: 0, opacity: 1, duration: 1.0, stagger: 0.15, ease: "power3.out" },
+              7.8
             )
             .to(
               ".soluzioni-scroll-wrapper",
@@ -623,19 +667,19 @@ export default function Home() {
                   const overflowHeight = wrapper.scrollHeight - window.innerHeight;
                   return overflowHeight > 0 ? -overflowHeight - 120 : 0;
                 },
-                duration: 2.0,
+                duration: 3.0,
                 ease: "none",
               },
-              4.5
+              8.4
             )
             // Transformation Section
             .fromTo(
               transformationSection,
               { opacity: 0 },
-              { opacity: 1, pointerEvents: "auto", duration: 1.0, ease: "power2.inOut" },
-              6.8
+              { opacity: 1, pointerEvents: "auto", duration: 1.2, ease: "power2.inOut" },
+              11.8
             )
-            .to(ctaSection, { opacity: 0, pointerEvents: "none", duration: 0.1 }, 7.4)
+            .to(ctaSection, { opacity: 0, pointerEvents: "none", duration: 0.5 }, 12.5)
             .fromTo(
               [
                 transformationSection.querySelector(".trans-title"),
@@ -643,8 +687,8 @@ export default function Home() {
                 transformationSection.querySelector(".trans-footer"),
               ],
               { y: 25, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out" },
-              7.1
+              { y: 0, opacity: 1, duration: 1.2, stagger: 0.18, ease: "power3.out" },
+              12.2
             )
             .to(
               ".trans-scroll-wrapper",
@@ -655,22 +699,22 @@ export default function Home() {
                   const overflowHeight = wrapper.scrollHeight - window.innerHeight;
                   return overflowHeight > 0 ? -overflowHeight : 0;
                 },
-                duration: 4.0,
+                duration: 5.0,
                 ease: "none",
               },
-              7.8
+              13.0
             )
             .fromTo(
               ".trans-bg",
               { y: () => window.innerHeight * 0.15 },
-              { y: () => -window.innerHeight * 0.15, duration: 4.0, ease: "none" },
-              7.8
+              { y: () => -window.innerHeight * 0.15, duration: 5.0, ease: "none" },
+              13.0
             );
 
           ScrollTrigger.create({
             trigger: overviewSection,
             start: "top top",
-            end: "+=1200%",
+            end: "+=1800%",
             pin: true,
             pinSpacing: true,
             scrub: 1,
@@ -706,9 +750,13 @@ export default function Home() {
           delete window.lenis;
         }
         mm.revert(); // reverte matchMedia e i suoi trigger
-        lenis.off("scroll", ScrollTrigger.update);
-        lenis.destroy();
-        gsap.ticker.remove(lenisRafFn);
+        if (lenis) {
+          lenis.off("scroll", ScrollTrigger.update);
+          lenis.destroy();
+        }
+        if (lenisRafFn) {
+          gsap.ticker.remove(lenisRafFn);
+        }
         ScrollTrigger.getAll().forEach((t) => t.kill()); // kill tutti i trigger rimasti
         canvasData?.cleanup(); // rimuove resize listener del canvas
       };

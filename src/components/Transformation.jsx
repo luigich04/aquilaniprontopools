@@ -92,9 +92,6 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, altBefore, altAfter }) {
           className="object-cover pointer-events-none"
           unoptimized
         />
-        <div className="absolute bottom-3 left-3 bg-black/55 backdrop-blur-md px-2.5 py-1 rounded text-white font-dm text-[8px] tracking-widest uppercase font-semibold">
-          Prima
-        </div>
       </div>
 
       {/* DOPO */}
@@ -109,9 +106,6 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, altBefore, altAfter }) {
           className="object-cover pointer-events-none"
           unoptimized
         />
-        <div className="absolute bottom-3 right-3 bg-[#3d5a80] backdrop-blur-md px-2.5 py-1 rounded text-white font-dm text-[8px] tracking-widest uppercase font-semibold">
-          Dopo
-        </div>
       </div>
 
       {/* Cursore del divisore */}
@@ -119,6 +113,16 @@ function BeforeAfterSlider({ beforeSrc, afterSrc, altBefore, altAfter }) {
         className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.3)] z-10 pointer-events-none"
         style={{ left: `${pct}%` }}
       >
+        {/* Label Prima (ancorata a destra della linea) */}
+        <div className="absolute bottom-3 left-3 bg-black/55 backdrop-blur-md px-2.5 py-1 rounded text-white font-dm text-[8px] tracking-widest uppercase font-semibold whitespace-nowrap">
+          Prima
+        </div>
+
+        {/* Label Dopo (ancorata a sinistra della linea) */}
+        <div className="absolute bottom-3 right-3 bg-[#3d5a80] backdrop-blur-md px-2.5 py-1 rounded text-white font-dm text-[8px] tracking-widest uppercase font-semibold whitespace-nowrap">
+          Dopo
+        </div>
+
         {/* Cursore premium con glassmorphism */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center shadow transition-transform duration-200 hover:scale-110">
           <svg
@@ -180,8 +184,8 @@ export default function Transformation({ setIsMethodModalOpen, scrollToSection }
         {/* Header Editoriale Massive Fullwidth */}
         <div className="w-full text-center trans-title select-none flex flex-col items-center justify-center">
           <h2
-            className="font-helvetica-ltw font-black uppercase text-white tracking-[-0.06em] leading-[0.78] text-center flex flex-col items-center"
-            style={{ fontSize: "clamp(55px, 13vw, 180px)" }}
+            className="font-host font-black uppercase text-white tracking-[-0.06em] leading-[0.78] text-center flex flex-col items-center"
+            style={{ fontSize: "clamp(80px, 13vw, 200px)" }}
           >
             <span className="block">GUARDA COSA</span>
             <span className="block">POSSIAMO CREARE</span>
@@ -211,10 +215,10 @@ export default function Transformation({ setIsMethodModalOpen, scrollToSection }
                 <div
                   className={`lg:col-span-5 text-left flex flex-col gap-2 ${isEven ? "lg:order-1" : ""}`}
                 >
-                  <h3 className="font-helvetica-ltw font-bold text-[20px] lg:text-[24px] leading-tight text-white">
+                  <h3 className="font-host font-bold text-[20px] lg:text-[24px] leading-tight text-white">
                     {proj.name}
                   </h3>
-                  <p className="font-helvetica-ltw text-[13px] lg:text-[14px] leading-relaxed text-neutral-300">
+                  <p className="font-host text-[13px] lg:text-[14px] leading-relaxed text-neutral-300">
                     {proj.desc}
                   </p>
                 </div>

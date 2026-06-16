@@ -210,3 +210,10 @@ header.scrolled {
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+/* Force Hero section to always cover the full dynamic viewport height, 
+   overriding fixed inline heights set by GSAP ScrollTrigger pinning on mobile. */
+.hero {
+  height: 100vh !important;
+  height: 100dvh !important;
+}

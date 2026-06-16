@@ -12,16 +12,28 @@ export default function Hero({ canvasRef, bgImageRef, overlayRef, heroTextRef })
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover z-0" />
 
       {/* Immagine di sfondo iniziale (sfuma per rivelare il canvas) */}
-      <Image
-        ref={bgImageRef}
-        src="/img/overlay_hero.png"
-        alt="Aquilani Pronto Pools Hero Background"
-        fill
-        className="object-cover z-[5] pointer-events-none"
-        priority
-        sizes="100vw"
-        unoptimized
-      />
+      <div ref={bgImageRef} className="absolute inset-0 z-[5] pointer-events-none">
+        {/* Desktop Background */}
+        <Image
+          src="/img/overlay_hero.png"
+          alt="Aquilani Pronto Pools Hero Background"
+          fill
+          className="hidden lg:block object-cover"
+          priority
+          sizes="100vw"
+          unoptimized
+        />
+        {/* Mobile Background */}
+        <Image
+          src="/img/overlay_mobile.png"
+          alt="Aquilani Pronto Pools Hero Background Mobile"
+          fill
+          className="block lg:hidden object-cover"
+          priority
+          sizes="100vw"
+          unoptimized
+        />
+      </div>
 
       {/* Overlay scuro (sfuma insieme al testo) */}
       <div ref={overlayRef} className="absolute inset-0 bg-black/35 z-10 pointer-events-none" />

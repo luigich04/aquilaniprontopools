@@ -54,7 +54,7 @@ export default function Overview() {
 
         {/* Colonna destra: immagini cinematiche scorrevoli */}
         <div
-          className="w-full lg:w-[60%] flex flex-row lg:flex-col lg:relative mobile-horizontal-track overflow-visible flex-nowrap"
+          className="w-full lg:w-[60%] flex flex-row lg:flex-col relative mobile-horizontal-track overflow-visible flex-nowrap"
           style={{ perspective: "1000px", perspectiveOrigin: "center center" }}
         >
           {[
@@ -83,7 +83,7 @@ export default function Overview() {
             return (
               <div
                 key={i}
-                className={`w-screen shrink-0 lg:w-full h-[60vh] lg:h-screen flex items-center px-4 md:px-6 ${
+                className={`w-full shrink-0 h-[60vh] lg:h-screen flex items-center px-4 md:px-6 ${
                   isLast ? "last-frame-slot" : ""
                 }`}
               >
