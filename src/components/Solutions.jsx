@@ -22,7 +22,7 @@ export default function Solutions({ scrollToSection }) {
         unoptimized
       />
 
-      <div className="soluzioni-scroll-wrapper max-w-[1200px] w-full flex flex-col items-center gap-6 lg:gap-8 relative z-10">
+      <div className="soluzioni-scroll-wrapper max-w-[1200px] w-full flex flex-col items-center gap-6 lg:gap-20 relative z-10">
         {/* Header Soluzioni */}
         <div className="text-center flex flex-col gap-2">
           <h2
@@ -34,7 +34,7 @@ export default function Solutions({ scrollToSection }) {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-12 w-full">
           {[
             {
               title: "Fuori terra",
@@ -57,7 +57,7 @@ export default function Solutions({ scrollToSection }) {
           ].map((card, i) => (
             <div
               key={i}
-              className="soluzione-card relative flex flex-col justify-between min-h-[340px] lg:min-h-[340px] lg:h-[340px] rounded-[24px] border border-white/10 overflow-hidden group"
+              className="soluzione-card relative flex flex-col justify-between min-h-[340px] lg:min-h-[420px] lg:h-[420px] rounded-[24px] border border-white/10 overflow-hidden group"
             >
               {/* Immagine di sfondo a tutta la card */}
               <Image
@@ -76,12 +76,12 @@ export default function Solutions({ scrollToSection }) {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(158,216,255,0.03),transparent_50%)] opacity-80 group-hover:opacity-100 group-hover:bg-[radial-gradient(circle_at_80%_20%,rgba(158,216,255,0.08),transparent_50%)] transition-all duration-500 pointer-events-none z-20" />
 
               {/* Contenuto (Testi in alto per lasciare visibile lo sfondo) */}
-              <div className="pt-10 pb-6 px-6 flex flex-col items-center justify-start h-full text-center relative z-30">
-                <div className="flex flex-col items-center gap-2">
-                  <h3 className="font-host font-semibold text-[17px] leading-tight text-[#f5f3ef] transition-colors duration-300 group-hover:text-white">
+              <div className="pt-10 pb-6 px-6 lg:pt-16 lg:pb-10 lg:px-10 flex flex-col items-center justify-start h-full text-center relative z-30">
+                <div className="flex flex-col items-center gap-2 lg:gap-6">
+                  <h3 className="font-host font-semibold text-[17px] lg:text-[20px] leading-tight text-[#f5f3ef] transition-colors duration-300 group-hover:text-white">
                     {card.title}
                   </h3>
-                  <p className="font-host text-[12px] leading-relaxed text-[#c0c0c5] max-w-[24ch] transition-colors duration-300 group-hover:text-white/95">
+                  <p className="font-host text-[12px] lg:text-[13.5px] leading-relaxed text-[#c0c0c5] max-w-[24ch] lg:max-w-[28ch] transition-colors duration-300 group-hover:text-white/95">
                     {card.desc}
                   </p>
                 </div>

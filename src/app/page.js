@@ -39,6 +39,11 @@ export default function Home() {
       } else {
         setScrolled(false);
       }
+
+      // Force header theme to dark when scroll is within the Hero section to avoid staying light/black
+      if (window.scrollY < heroHeight * 2.5) {
+        setHeaderTheme("dark");
+      }
     };
     window.addEventListener("scroll", handleScroll);
     // Inizializza al caricamento
@@ -68,42 +73,44 @@ export default function Home() {
     const isDesktop = window.innerWidth >= 1024;
     const h = window.innerHeight;
 
-    if (isDesktop && window.lenis) {
-      if (sectionName === "contact" || sectionName === "get-started") {
-        window.lenis.scrollTo("bottom", { duration: 1.5 });
-        return;
-      }
+    if (isDesktop) {
+      if (window.lenis) {
+        if (sectionName === "contact" || sectionName === "get-started") {
+          window.lenis.scrollTo("bottom", { duration: 1.5 });
+          return;
+        }
 
+        let targetScroll = 0;
+        if (sectionName === "hero" || sectionName === "home") {
+          targetScroll = 0;
+        } else if (sectionName === "overview") {
+          targetScroll = 3.5 * h;
+        } else if (sectionName === "solutions") {
+          targetScroll = 5.4 * h; // Matches Solutions fade-in start at 1.9 in desktop timeline
+        } else if (
+          sectionName === "transformation" ||
+          sectionName === "demo"
+        ) {
+          targetScroll = 6.7 * h; // Matches Transformation fade-in start at 3.2 in desktop timeline
+        }
+        window.lenis.scrollTo(targetScroll, { duration: 1.5 });
+      }
+    } else {
+      // Mobile smooth scroll using pixel coordinates to handle pinned container offsets correctly
       let targetScroll = 0;
       if (sectionName === "hero" || sectionName === "home") {
         targetScroll = 0;
       } else if (sectionName === "overview") {
         targetScroll = 3.5 * h;
       } else if (sectionName === "solutions") {
-        targetScroll = 9.4 * h;
-      } else if (
-        sectionName === "transformation" ||
-        sectionName === "demo"
-      ) {
-        targetScroll = 11.0 * h;
-      }
-      window.lenis.scrollTo(targetScroll, { duration: 1.5 });
-    } else {
-      let targetId = sectionName;
-      if (sectionName === "home") targetId = "hero";
-      if (sectionName === "demo") {
-        targetId = "transformation";
+        targetScroll = 7.5 * h; // 3.5 * h (start of trigger) + 4.0 * h (solutions fade-in in mobile timeline)
+      } else if (sectionName === "transformation" || sectionName === "demo") {
+        targetScroll = 9.5 * h; // 3.5 * h (start of trigger) + 6.0 * h (transformation fade-in in mobile timeline)
       } else if (sectionName === "contact" || sectionName === "get-started") {
-        targetId = "contact";
+        // Scroll to bottom where the contact footer is
+        targetScroll = document.documentElement.scrollHeight;
       }
-      if (sectionName === "hero") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
-      }
-      const el = document.getElementById(targetId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
+      window.scrollTo({ top: targetScroll, behavior: "smooth" });
     }
   };
 
@@ -563,35 +570,35 @@ export default function Home() {
           pinTl
             .call(() => {
               const time = pinTl.time();
-              setHeaderTheme(time < 7.2 ? "light" : "dark");
+              setHeaderTheme(time < 4.0 ? "light" : "dark");
             }, null, 0)
             .call(() => {
               const time = pinTl.time();
-              setHeaderTheme(time < 7.2 ? "light" : "dark");
-            }, null, 7.2)
+              setHeaderTheme(time < 4.0 ? "light" : "dark");
+            }, null, 4.0)
             .to(".mobile-horizontal-track", {
               x: () => {
                 const track = document.querySelector(".mobile-horizontal-track");
                 return track ? -(track.offsetWidth * 3) : -(window.innerWidth * 3);
               },
               ease: "none",
-              duration: 4.0,
+              duration: 2.5,
             }, 0)
             // Frame 2 active
-            .to(frames[1], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 0.8)
-            .to(frames[0], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 0.8)
+            .to(frames[1], { rotateX: 0, scale: 1, opacity: 1, duration: 0.5 }, 0.5)
+            .to(frames[0], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.5 }, 0.5)
             // Frame 3 active
-            .to(frames[2], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 2.0)
-            .to(frames[1], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 2.0)
+            .to(frames[2], { rotateX: 0, scale: 1, opacity: 1, duration: 0.5 }, 1.2)
+            .to(frames[1], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.5 }, 1.2)
             // Frame 4 active
-            .to(frames[3], { rotateX: 0, scale: 1, opacity: 1, duration: 0.8 }, 3.2)
-            .to(frames[2], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.8 }, 3.2)
+            .to(frames[3], { rotateX: 0, scale: 1, opacity: 1, duration: 0.5 }, 1.9)
+            .to(frames[2], { rotateX: -18, scale: 0.9, opacity: 0.6, duration: 0.5 }, 1.9)
 
             // Fade out left text panel and captions
             .to(
               [leftPanel, ".last-caption"],
-              { opacity: 0, duration: 0.8, ease: "power2.inOut" },
-              3.2
+              { opacity: 0, duration: 0.6, ease: "power2.inOut" },
+              1.9
             )
 
             // Centering last wrapper visually onto mobile screen center
@@ -603,10 +610,10 @@ export default function Home() {
                   const rect = lastWrapper.getBoundingClientRect();
                   return window.innerHeight / 2 - (rect.top + rect.height / 2);
                 },
-                duration: 1.0,
+                duration: 0.8,
                 ease: "power2.inOut",
               },
-              4.0
+              2.5
             )
             // Scale last wrapper zoom
             .to(
@@ -618,35 +625,35 @@ export default function Home() {
                   const scaleY = window.innerHeight / rect.height;
                   return Math.max(scaleX, scaleY) * 1.05;
                 },
-                duration: 2.0,
+                duration: 0.7,
                 ease: "none",
               },
-              5.0
+              3.3
             )
             .fromTo(
               ".zoom-layer-2",
               { scale: 0 },
-              { scale: 2.5, duration: 1.8, ease: "none" },
-              5.2
+              { scale: 2.5, duration: 0.6, ease: "none" },
+              3.4
             )
             .fromTo(
               ".zoom-layer-3",
               { scale: 0 },
-              { scale: 2.5, duration: 1.6, ease: "none" },
-              5.4
+              { scale: 2.5, duration: 0.5, ease: "none" },
+              3.5
             )
             .fromTo(
               ".zoom-layer-cta",
               { scale: 0 },
-              { scale: 2.5, duration: 1.4, ease: "none" },
-              5.6
+              { scale: 2.5, duration: 0.4, ease: "none" },
+              3.6
             )
             // Solutions Section
             .fromTo(
               ctaSection,
               { scale: 0.9, opacity: 0 },
-              { opacity: 1, scale: 1, pointerEvents: "auto", duration: 0.8, ease: "power2.out" },
-              7.2
+              { opacity: 1, scale: 1, pointerEvents: "auto", duration: 0.5, ease: "power2.out" },
+              4.0
             )
             .fromTo(
               [
@@ -655,8 +662,8 @@ export default function Home() {
                 ctaSection.querySelector(".soluzioni-cta"),
               ],
               { y: 35, opacity: 0 },
-              { y: 0, opacity: 1, duration: 1.0, stagger: 0.15, ease: "power3.out" },
-              7.8
+              { y: 0, opacity: 1, duration: 0.6, stagger: 0.12, ease: "power3.out" },
+              4.3
             )
             .to(
               ".soluzioni-scroll-wrapper",
@@ -667,19 +674,19 @@ export default function Home() {
                   const overflowHeight = wrapper.scrollHeight - window.innerHeight;
                   return overflowHeight > 0 ? -overflowHeight - 120 : 0;
                 },
-                duration: 3.0,
+                duration: 1.2,
                 ease: "none",
               },
-              8.4
+              4.8
             )
             // Transformation Section
             .fromTo(
               transformationSection,
               { opacity: 0 },
-              { opacity: 1, pointerEvents: "auto", duration: 1.2, ease: "power2.inOut" },
-              11.8
+              { opacity: 1, pointerEvents: "auto", duration: 0.5, ease: "power2.inOut" },
+              6.0
             )
-            .to(ctaSection, { opacity: 0, pointerEvents: "none", duration: 0.5 }, 12.5)
+            .to(ctaSection, { opacity: 0, pointerEvents: "none", duration: 0.3 }, 6.2)
             .fromTo(
               [
                 transformationSection.querySelector(".trans-title"),
@@ -687,8 +694,8 @@ export default function Home() {
                 transformationSection.querySelector(".trans-footer"),
               ],
               { y: 25, opacity: 0 },
-              { y: 0, opacity: 1, duration: 1.2, stagger: 0.18, ease: "power3.out" },
-              12.2
+              { y: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power3.out" },
+              6.2
             )
             .to(
               ".trans-scroll-wrapper",
@@ -699,22 +706,22 @@ export default function Home() {
                   const overflowHeight = wrapper.scrollHeight - window.innerHeight;
                   return overflowHeight > 0 ? -overflowHeight : 0;
                 },
-                duration: 5.0,
+                duration: 1.8,
                 ease: "none",
               },
-              13.0
+              6.5
             )
             .fromTo(
               ".trans-bg",
               { y: () => window.innerHeight * 0.15 },
-              { y: () => -window.innerHeight * 0.15, duration: 5.0, ease: "none" },
-              13.0
+              { y: () => -window.innerHeight * 0.15, duration: 1.8, ease: "none" },
+              6.5
             );
 
           ScrollTrigger.create({
             trigger: overviewSection,
             start: "top top",
-            end: "+=1800%",
+            end: "+=830%",
             pin: true,
             pinSpacing: true,
             scrub: 1,
